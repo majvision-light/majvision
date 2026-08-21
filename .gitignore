@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+.AppleDouble
+Icon?
+
+# Editory
+.vscode/
+.idea/
+*.swp
+*~
+
+# Lokálne nástroje a logy
+.claude/
+*.log

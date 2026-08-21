@@ -48,9 +48,48 @@
 
   <section class="about section" id="about"><div class="aboutVisual"><span>DESIGN<br>PROGRAMMING<br>OPERATION</span></div><div class="aboutCopy"><p class="kicker">/ SAMUEL · MAJVISION</p><h2>Za pultom.<br>Aj pred ním.</h2><p>Volám sa Samuel a pôsobím ako light designer v Bratislave. Svetlo vnímam ako priestor, v ktorom sa stretáva technická presnosť s emóciou. Každý projekt preto začínam hľadaním atmosféry a vizuálneho jazyka, ktorý prirodzene vyrastá z hudby, priestoru a charakteru interpreta.</p><p>Svetelné show navrhujem, pripravujem v 3D, programujem a podľa potrieb projektu aj ovládam naživo. Vďaka skúsenostiam z celého procesu dokážem premýšľať nad výsledným obrazom aj nad jeho reálnym fungovaním na pódiu. Dizajn vytváram s ohľadom na technické možnosti produkcie, meniace sa podmienky počas turné a energiu živého vystúpenia.</p><div class="tools"><span>ChamSys MagicQ</span><span>grandMA3</span><span>Capture</span><span>Timecode</span></div></div></section>
 
-  <section class="contact section" id="contact"><div class="contactTitle"><p class="kicker">/ NOVÁ SPOLUPRÁCA</p><h2>Nová hudba.<br><em>Nový obraz.</em></h2><p>Ak pripravujete koncert, turné, predstavenie alebo jednorazový event, pošlite mi termín, miesto, hudobné ukážky a základnú predstavu o projekte. Ozvem sa vám a spoločne si prejdeme rozsah práce, technické možnosti aj ďalší postup.</p><a href="mailto:light@majvision.com">light@majvision.com ↗</a><a class="instagram" href="https://instagram.com/majvision_" target="_blank" rel="noreferrer">Instagram @majvision_ ↗</a></div><form action="https://formsubmit.co/light@majvision.com" method="POST"><input type="hidden" name="_subject" value="Nový projekt z majvision.com"><input type="hidden" name="_template" value="table"><input class="formHoney" type="text" name="_honey" tabindex="-1" autocomplete="off"><label>Meno / produkcia<input name="Meno alebo produkcia" required placeholder="Kto sa ozýva?"></label><label>E-mail<input name="email" type="email" required placeholder="vas@email.sk"></label><label class="full">Typ projektu<select name="Typ projektu" required><option value="" disabled selected>Čo pripravujete?</option><option>Koncert alebo festival</option><option>Divadlo</option><option>Event</option><option>Timecode show</option><option>Iné</option></select></label><label class="full">O projekte<textarea name="Správa" required placeholder="Termín, miesto, rozsah a predstava..." rows="5"></textarea></label><button class="btn primary" type="submit">Odoslať projekt ↗</button></form></section>
+  <section class="contact section" id="contact"><div class="contactTitle"><p class="kicker">/ NOVÁ SPOLUPRÁCA</p><h2>Nová hudba.<br><em>Nový obraz.</em></h2><p>Ak pripravujete koncert, turné, predstavenie alebo jednorazový event, pošlite mi termín, miesto, hudobné ukážky a základnú predstavu o projekte. Ozvem sa vám a spoločne si prejdeme rozsah práce, technické možnosti aj ďalší postup.</p><a href="mailto:light@majvision.com">light@majvision.com ↗</a><a class="instagram" href="https://instagram.com/majvision_" target="_blank" rel="noreferrer">Instagram @majvision_ ↗</a></div><form id="contactForm" action="https://api.web3forms.com/submit" method="POST"><!-- Access key z web3forms.com (Create Access Key -> príde e-mailom). Nahraď hodnotu nižšie. --><input type="hidden" name="access_key" value="de63ae07-8106-48c7-bc31-4310ffb6764e"><input type="hidden" name="subject" value="Nový projekt z majvision.com"><input type="hidden" name="from_name" value="majvision.com"><input class="formHoney" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off"><label>Meno / produkcia<input name="name" required placeholder="Kto sa ozýva?"></label><label>E-mail<input name="email" type="email" required placeholder="vas@email.sk"></label><label class="full">Typ projektu<select name="Typ projektu" required><option value="" disabled selected>Čo pripravujete?</option><option>Koncert alebo festival</option><option>Divadlo</option><option>Event</option><option>Timecode show</option><option>Iné</option></select></label><label class="full">O projekte<textarea name="Správa" required placeholder="Termín, miesto, rozsah a predstava..." rows="5"></textarea></label><button class="btn primary" type="submit">Odoslať projekt ↗</button><p class="formStatus" id="formStatus" role="status" aria-live="polite" hidden></p></form></section>
 
   <footer><a class="brand" href="#top">maj<span>vision</span></a><p>Light design · Show programming · Previsualization</p><div><a href="#work">Portfólio</a><a href="#services">Služby</a><a href="https://instagram.com/majvision_" target="_blank" rel="noreferrer">Instagram</a><a href="#contact">Kontakt</a></div><span>© 2026 majvision</span></footer>
 </main>
+<script>
+(function () {
+  var form = document.getElementById('contactForm');
+  if (!form || !window.fetch) return;
+  var status = document.getElementById('formStatus');
+  var button = form.querySelector('button[type="submit"]');
+  var fail = 'Správu sa nepodarilo odoslať. Napíšte mi prosím priamo na light@majvision.com.';
+
+  function show(text, state) {
+    status.hidden = false;
+    status.className = 'formStatus' + (state ? ' ' + state : '');
+    status.textContent = text;
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    button.disabled = true;
+    show('Odosielam…');
+
+    var payload = {};
+    new FormData(form).forEach(function (value, key) { payload[key] = value; });
+
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          if (!response.ok || !data.success) throw new Error(data.message || fail);
+          form.reset();
+          show('Ďakujem, správa je odoslaná. Ozvem sa čo najskôr.', 'ok');
+        });
+      })
+      .catch(function () { show(fail, 'err'); })
+      .then(function () { button.disabled = false; });
+  });
+})();
+</script>
 </body>
 </html>

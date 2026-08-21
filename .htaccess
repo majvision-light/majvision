@@ -1,0 +1,50 @@
+# majvision — Apache konfigurácia pre zdieľaný hosting
+
+Options -Indexes
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+# --- Vynútenie HTTPS (kanonická adresa: https://majvision.com) ---
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# funguje priamo aj za proxy/load balancerom
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# www -> bez www
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# --- Kompresia ---
+<IfModule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript image/svg+xml
+</IfModule>
+
+# --- Cache ---
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType text/html "access plus 0 seconds"
+ExpiresByType text/css "access plus 7 days"
+ExpiresByType image/jpeg "access plus 1 year"
+ExpiresByType image/png "access plus 1 year"
+ExpiresByType image/svg+xml "access plus 1 year"
+ExpiresByType video/mp4 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_mime.c>
+AddType video/mp4 .mp4
+AddType image/svg+xml .svg
+</IfModule>
+
+# --- Bezpečnostné hlavičky ---
+<IfModule mod_headers.c>
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# HSTS zapni až keď HTTPS spoľahlivo funguje (prehliadače si ho zapamätajú na rok):
+# Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
