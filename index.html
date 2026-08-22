@@ -22,7 +22,7 @@
     <main>
       <header>
         <a class="brand" href="#top">maj<span>vision</span></a>
-        <nav>
+        <button class="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Menu"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="navBar1" d="M4 6h16"/><path class="navBar2" d="M4 12h16"/><path class="navBar3" d="M4 18h16"/></svg></button><nav id="mainNav">
           <a href="#work">Portfólio</a><a href="#services">Služby</a
           ><a href="#about">O mne</a><a href="#contact">Kontakt</a>
         </nav>
@@ -81,9 +81,13 @@
             <img
               src="assets/listen-stage.jpeg"
               alt="Tmavá divadelná scéna vo svetle a hmle"
+            loading="lazy"
+              decoding="async"
             /><img
               src="assets/listen-console.jpeg"
               alt="Svetelný pult ChamSys v divadle"
+            loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -115,62 +119,84 @@
             <img
               src="assets/saul-01.jpeg"
               alt="SAUL S.A.M.O. Tour 2025, červený svetelný dizajn"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure>
             <img
               src="assets/saul-02.jpeg"
               alt="Silueta kríža vo svetelných lúčoch"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-03.jpeg"
               alt="Biely svetelný obraz S.A.M.O. Tour"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-04.jpeg"
               alt="SAUL na pódiu v bielych svetelných stĺpoch"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-05.jpeg"
               alt="Modrý svetelný dizajn a scéna S.A.M.O. Tour"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
-            <img src="assets/saul-06.jpeg" alt="Sólo klavír v kuželi svetla" />
+            <img src="assets/saul-06.jpeg" alt="Sólo klavír v kuželi svetla" loading="lazy"
+              decoding="async"
+            />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-07.jpeg"
               alt="Live show z pozície pri svetelnom pulte"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-08.jpeg"
               alt="Tri modré svetelné scény zo S.A.M.O. Tour"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-09.jpeg"
               alt="Svetelné lúče, scéna a publikum"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait">
             <img
               src="assets/saul-10.jpeg"
               alt="SAUL pod dvojicou svetelných lúčov"
+            loading="lazy"
+              decoding="async"
             />
           </figure>
           <figure class="portrait video">
             <video
-              src="assets/saul-11.mp4"
+              data-src="assets/saul-11.mp4"
+              preload="none"
+              poster="assets/saul-10.jpeg"
               autoplay
               muted
               loop
@@ -197,9 +223,13 @@
             <img
               src="assets/services-red.jpeg"
               alt="Programovanie červeného svetelného obrazu v previzualizácii"
+            loading="lazy"
+              decoding="async"
             /><img
               src="assets/services-blue.jpeg"
               alt="Programovanie modrého svetelného obrazu v previzualizácii"
+            loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -494,6 +524,90 @@
         <span>© 2026 majvision</span>
       </footer>
     </main>
+<script>
+(function () {
+  var toggle = document.querySelector('.navToggle');
+  var nav = document.getElementById('mainNav');
+  if (!toggle || !nav) return;
+
+  function setOpen(open) {
+    document.body.classList.toggle('navOpen', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? 'Zavrieť menu' : 'Menu');
+  }
+
+  toggle.addEventListener('click', function () {
+    setOpen(!document.body.classList.contains('navOpen'));
+  });
+
+  nav.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') setOpen(false);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('navOpen')) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Video sa nacita az ked je blizko viewportu - autoplay by inak
+     stiahol 2,5 MB hned pri otvoreni stranky. */
+  var video = document.querySelector('video[data-src]');
+  if (video) {
+    if (!('IntersectionObserver' in window)) {
+      video.src = video.dataset.src;
+    } else {
+      new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          video.src = video.dataset.src;
+          obs.unobserve(video);
+        });
+      }, { rootMargin: '300px' }).observe(video);
+    }
+  }
+
+  /* Odhalovanie obsahu pri scrollovani. Animuje sa len opacity a
+     transform, takze to bezi na kompozitore bez prekreslovania layoutu. */
+  if (reduce || !('IntersectionObserver' in window)) return;
+
+  var targets = document.querySelectorAll(
+    '.statement > .kicker, .statement h2, .statement div > p, .statementPhotos,' +
+    '.sectionHead, .projectMeta, .saulGallery figure,' +
+    '.servicesIntro, .serviceList article,' +
+    '.processGrid > *, .aboutVisual, .aboutCopy > *,' +
+    '.contactTitle > *, .contact form'
+  );
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('isIn');
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+
+  targets.forEach(function (el, i) {
+    el.classList.add('reveal');
+    /* male oneskorenie v ramci skupiny vytvori kaskadu, max 3 kroky */
+    el.style.setProperty('--d', (i % 4) * 60 + 'ms');
+    io.observe(el);
+  });
+
+  /* Poistka: keby observer z akehokolvek dovodu nezbehol, obsah nesmie
+     ostat neviditelny - po 2,5 s efekt zrusime. */
+  setTimeout(function () {
+    if (document.querySelector('.reveal.isIn')) return;
+    targets.forEach(function (el) { el.classList.remove('reveal'); });
+  }, 2500);
+})();
+</script>
     <script>
       (function () {
         var root = document.querySelector("[data-select]");
